@@ -8,3 +8,5 @@ build/
 .next/
 *.db
 *.db-journal
+*.tsbuildinfo
+
