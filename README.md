@@ -51,3 +51,22 @@ npm run dev
 
 ### 4. Open the App
 Go to `http://localhost:5173` in your browser. Register a new account to get started!
+
+---
+
+## Deploying to Vercel
+
+FinSense can be deployed to Vercel as two linked projects (Frontend + Backend) from this repository:
+
+1. **Deploy Backend (`/server`)**:
+   - Vercel Root Directory: `server`
+   - Framework: `Next.js`
+   - Environment Variables: `DATABASE_URL` (PostgreSQL), `JWT_SECRET`, `GEMINI_API_KEY`, `CLIENT_ORIGIN`
+
+2. **Deploy Frontend (`/client`)**:
+   - Vercel Root Directory: `client`
+   - Framework: `Vite`
+   - Environment Variables: `VITE_API_URL` (Your deployed backend URL)
+
+For a detailed step-by-step walkthrough, see [VERCEL_DEPLOYMENT.md](file:///VERCEL_DEPLOYMENT.md).
+

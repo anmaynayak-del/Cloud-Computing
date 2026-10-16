@@ -12,10 +12,12 @@ import {
   AlertTriangle, 
   AlertOctagon, 
   CheckCircle, 
-  X 
+  X,
+  ChevronsLeft,
+  Wallet
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { fetchApi } from '../lib/api';
+import { fetchApi, getApiUrl } from '../lib/api';
 import { formatINR } from '../lib/currency';
 
 interface AlertItem {
@@ -32,7 +34,7 @@ interface AlertItem {
 export const Layout = () => {
   const { user, setUser } = useAuth();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Alerts State
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
@@ -72,166 +74,244 @@ export const Layout = () => {
   }, [dropdownOpen]);
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    await fetch(getApiUrl('/api/auth/logout'), { method: 'POST', credentials: 'include' });
     setUser(null);
   };
 
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Accounts', path: '/accounts', icon: LayoutDashboard },
+    { name: 'Accounts', path: '/accounts', icon: Wallet },
     { name: 'Transactions', path: '/transactions', icon: Receipt },
     { name: 'Budgets', path: '/budgets', icon: PieChart },
     { name: 'Goals', path: '/goals', icon: Target },
     { name: 'AI Adviser', path: '/chat', icon: MessageSquare },
   ];
 
+  // User Initials Badge (like 'PA' in CardioNexus)
+  const userInitials = (user?.name || user?.email || 'User')
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(p => p[0].toUpperCase())
+    .join('') || 'U';
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex">
-      {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-200 ease-in-out`}>
-        <div className="h-16 flex items-center justify-center border-b dark:border-gray-700">
-          <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">FinSense</h1>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col">
+      {/* Top Header Bar (spans full width) */}
+      <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-6 sticky top-0 z-30 shadow-xs">
+        <div className="flex items-center space-x-3.5">
+          {/* 3 lines button (visible when sidebar is closed) */}
+          {!sidebarOpen && (
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-1.5 rounded-lg text-emerald-800 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition cursor-pointer"
+              title="Open Dashboard Sidebar"
+              aria-label="Open Dashboard Sidebar"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Brand Logo */}
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+              <Wallet className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-xl font-bold text-emerald-900 dark:text-emerald-300 tracking-tight">
+              FinSense
+            </span>
+          </Link>
         </div>
-        <nav className="p-4 space-y-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <Link 
-                key={item.path} 
-                to={item.path} 
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${isActive ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-64 transition-all">
-        <header className="h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center justify-between px-4 lg:px-8">
-          <button className="lg:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu className="w-6 h-6" />
-          </button>
-          <div className="flex-1"></div>
-          
-          <div className="flex items-center space-x-4">
-            {/* Overspending Alerts Bell */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-                title="Overspending Alerts"
-                aria-label="Overspending Alerts"
-              >
-                <Bell className="w-5 h-5" />
-                {alertsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border-2 border-white dark:border-gray-800 animate-pulse">
-                    {alertsCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Alerts Dropdown */}
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
-                  <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-700 flex justify-between items-center">
-                    <div className="flex items-center space-x-2">
-                      <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
-                        Budget Alerts ({alertsCount})
-                      </h4>
-                    </div>
-                    <button 
-                      onClick={() => setDropdownOpen(false)}
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="max-h-80 overflow-y-auto divide-y dark:divide-gray-700">
-                    {alerts.length === 0 ? (
-                      <div className="p-6 text-center space-y-2">
-                        <CheckCircle className="w-8 h-8 text-green-500 mx-auto" />
-                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">All Budgets on Track</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">No categories have exceeded 80% of their monthly limit.</p>
-                      </div>
-                    ) : (
-                      alerts.map((alert) => (
-                        <div 
-                          key={alert.id}
-                          className={`p-3.5 flex items-start space-x-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/30 ${
-                            alert.type === 'OVER_BUDGET' ? 'bg-red-50/40 dark:bg-red-900/10' : 'bg-amber-50/40 dark:bg-amber-900/10'
-                          }`}
-                        >
-                          <div className="mt-0.5 flex-shrink-0">
-                            {alert.type === 'OVER_BUDGET' ? (
-                              <div className="p-1.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 rounded-lg">
-                                <AlertOctagon className="w-4 h-4" />
-                              </div>
-                            ) : (
-                              <div className="p-1.5 bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 rounded-lg">
-                                <AlertTriangle className="w-4 h-4" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                                {alert.category}
-                              </p>
-                              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                                alert.type === 'OVER_BUDGET' 
-                                  ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' 
-                                  : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
-                              }`}>
-                                {alert.percent}%
-                              </span>
-                            </div>
-                            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
-                              Spent {formatINR(alert.spent)} of {formatINR(alert.budgeted)}
-                            </p>
-                            <p className="text-[11px] font-medium mt-1 text-gray-500 dark:text-gray-400">
-                              {alert.type === 'OVER_BUDGET' ? 'Over budget by ' + formatINR(alert.spent - alert.budgeted) : 'Approaching monthly budget threshold'}
-                            </p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="p-2.5 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 text-center">
-                    <Link
-                      to="/budgets"
-                      onClick={() => setDropdownOpen(false)}
-                      className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline inline-block"
-                    >
-                      Manage Category Budgets →
-                    </Link>
-                  </div>
-                </div>
+        {/* Right Header: Alerts Bell & User Avatar Badge */}
+        <div className="flex items-center space-x-4">
+          {/* Overspending Alerts Bell */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              title="Overspending Alerts"
+              aria-label="Overspending Alerts"
+            >
+              <Bell className="w-5 h-5" />
+              {alertsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border-2 border-white dark:border-gray-900 animate-pulse">
+                  {alertsCount}
+                </span>
               )}
+            </button>
+
+            {/* Alerts Dropdown */}
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
+                <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-700 flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                    <Bell className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                      Budget Alerts ({alertsCount})
+                    </h4>
+                  </div>
+                  <button 
+                    onClick={() => setDropdownOpen(false)}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="max-h-80 overflow-y-auto divide-y dark:divide-gray-700">
+                  {alerts.length === 0 ? (
+                    <div className="p-6 text-center space-y-2">
+                      <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto" />
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">All Budgets on Track</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">No categories have exceeded 80% of their limit.</p>
+                    </div>
+                  ) : (
+                    alerts.map((alert) => (
+                      <div 
+                        key={alert.id}
+                        className={`p-3.5 flex items-start space-x-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/30 ${
+                          alert.type === 'OVER_BUDGET' ? 'bg-red-50/40 dark:bg-red-900/10' : 'bg-amber-50/40 dark:bg-amber-900/10'
+                        }`}
+                      >
+                        <div className="mt-0.5 flex-shrink-0">
+                          {alert.type === 'OVER_BUDGET' ? (
+                            <div className="p-1.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 rounded-lg">
+                              <AlertOctagon className="w-4 h-4" />
+                            </div>
+                          ) : (
+                            <div className="p-1.5 bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 rounded-lg">
+                              <AlertTriangle className="w-4 h-4" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                              {alert.category}
+                            </p>
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                              alert.type === 'OVER_BUDGET' 
+                                ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' 
+                                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
+                            }`}>
+                              {alert.percent}%
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                            Spent {formatINR(alert.spent)} of {formatINR(alert.budgeted)}
+                          </p>
+                          <p className="text-[11px] font-medium mt-1 text-gray-500 dark:text-gray-400">
+                            {alert.type === 'OVER_BUDGET' ? 'Over budget by ' + formatINR(alert.spent - alert.budgeted) : 'Approaching monthly budget threshold'}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="p-2.5 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 text-center">
+                  <Link
+                    to="/budgets"
+                    onClick={() => setDropdownOpen(false)}
+                    className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline inline-block"
+                  >
+                    Manage Category Budgets →
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* User Initials Avatar Badge (like 'PA' in CardioNexus) */}
+          <div 
+            className="w-8 h-8 rounded-full bg-emerald-800 text-white font-semibold text-xs flex items-center justify-center shadow-xs cursor-pointer select-none"
+            title={`${user?.name || user?.email} (Click to Logout)`}
+            onClick={handleLogout}
+          >
+            {userInitials}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Body Container: Sidebar + Content */}
+      <div className="flex flex-1 relative min-h-[calc(100vh-4rem)]">
+        {/* Sidebar (when open) */}
+        {sidebarOpen && (
+          <aside className="w-72 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col justify-between p-4 flex-shrink-0 animate-in slide-in-from-left duration-200 z-20">
+            <div>
+              {/* Workspace Header Row with << collapse icon */}
+              <div className="flex items-center justify-between px-3 py-2 mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  FINSENSE WORKSPACE
+                </span>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+                  title="Collapse sidebar"
+                  aria-label="Collapse sidebar"
+                >
+                  <ChevronsLeft className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Pill-shaped Navigation Items */}
+              <nav className="space-y-1.5">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => {
+                        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                          setSidebarOpen(false);
+                        }
+                      }}
+                      className={`flex items-center space-x-3.5 px-4 py-3 rounded-full text-base font-semibold transition-all ${
+                        isActive
+                          ? 'bg-emerald-100/75 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-300 shadow-xs'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-100'
+                      }`}
+                    >
+                      <Icon className="w-6 h-6 flex-shrink-0" />
+                      <span>{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
             </div>
 
-            <span className="text-sm font-medium">{user?.name}</span>
-            <button onClick={handleLogout} className="p-2 text-gray-500 hover:text-red-600 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Logout">
-              <LogOut className="w-5 h-5" />
-            </button>
-          </div>
-        </header>
+            {/* Bottom of Sidebar: Sign Out and Version */}
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-3.5 px-4 py-2.5 rounded-full text-base font-semibold text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition cursor-pointer"
+              >
+                <LogOut className="w-6 h-6 flex-shrink-0" />
+                <span>Sign Out</span>
+              </button>
+              <p className="text-xs text-center text-gray-400 dark:text-gray-500 font-mono">
+                FinSense v1.0.0
+              </p>
+            </div>
+          </aside>
+        )}
 
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+        {/* Mobile backdrop */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs z-10 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Main Content Area */}
+        <main className="flex-1 p-6 lg:p-10 overflow-y-auto">
           <Outlet />
         </main>
       </div>
-      
-      {/* Overlay */}
-      {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
     </div>
   );
 };

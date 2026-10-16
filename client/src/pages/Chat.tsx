@@ -9,24 +9,70 @@ interface Message {
   timestamp: Date;
 }
 
-const EXAMPLE_QUESTIONS = [
-  'Can I afford a ₹20,000 phone?',
-  'How can I reduce my expenses this month?',
-  'Am I on track with my category budgets?',
+const INITIAL_QUESTIONS = [
+  '💡 Recommend a monthly budget for me',
+  '📊 How should I allocate my 50/30/20 budget?',
+  '📱 Can I afford a ₹20,000 phone?',
+  '📉 How can I cut expenses by 15% this month?',
+  '🎯 Am I on track with my savings goals?',
 ];
+
+const cleanText = (text: string) => {
+  if (!text) return '';
+  return text.replace(/\*\*/g, '').replace(/\*/g, '');
+};
+
+const generateContextualFollowUps = (question: string): string[] => {
+  const lower = question.toLowerCase();
+  if (lower.includes('budget') || lower.includes('50/30/20') || lower.includes('allocate')) {
+    return [
+      'How can I lower my Essential Needs expenses?',
+      'What is the best way to track my discretionary spending?',
+      'How should I divide my savings between emergency fund and investments?',
+    ];
+  }
+  if (lower.includes('cut') || lower.includes('reduce') || lower.includes('save') || lower.includes('expense') || lower.includes('spend')) {
+    return [
+      'Which specific category should I trim first to save faster?',
+      'Can you suggest a daily spending limit for me?',
+      'How will these reductions impact my net monthly savings?',
+    ];
+  }
+  if (lower.includes('afford') || lower.includes('buy') || lower.includes('phone') || lower.includes('laptop') || lower.includes('cost')) {
+    return [
+      'What if I split this cost over 3 months?',
+      'How many months of surplus would I need to save up?',
+      'Will this purchase compromise any of my active savings goals?',
+    ];
+  }
+  if (lower.includes('goal') || lower.includes('target') || lower.includes('invest') || lower.includes('zerodha')) {
+    return [
+      'How can I accelerate reaching my savings goals?',
+      'Should I prioritize debt payoff or investing in my goals?',
+      'What percentage of my monthly income should go into investments?',
+    ];
+  }
+  return [
+    'How does this impact my overall monthly cash flow?',
+    'What step can I take this week to improve this?',
+    'Can you give me a category-by-category breakdown?',
+  ];
+};
 
 export const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
       role: 'model',
-      content: 'Hello! I am your FinSense AI Financial Adviser. I can help evaluate your purchases, review your monthly budgets, and analyze your cash flow.\n\nAsk me any question below, or select an example to get started!\n\nThis is not professional financial advice.',
+      content: 'Hello! I am your FinSense AI Financial Adviser. I am strictly dedicated to your personal finance: evaluating purchases, generating automated budget recommendations (50/30/20 rule), and analyzing your cash flow.\n\nAsk me any financial question below or select a prompt chip to get started!\n\nThis is not professional financial advice.',
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(INITIAL_QUESTIONS);
+  const [hasAskedQuestion, setHasAskedQuestion] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -47,7 +93,7 @@ export const Chat = () => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: q,
+      content: cleanText(q),
       timestamp: new Date(),
     };
 
@@ -80,10 +126,18 @@ export const Chat = () => {
           {
             id: (Date.now() + 1).toString(),
             role: 'model',
-            content: res.answer,
+            content: cleanText(res.answer),
             timestamp: new Date(),
           },
         ]);
+
+        // Update suggested follow-up questions dynamically based on what was asked
+        if (res.followUps && Array.isArray(res.followUps) && res.followUps.length > 0) {
+          setSuggestedQuestions(res.followUps.map(cleanText));
+        } else {
+          setSuggestedQuestions(generateContextualFollowUps(q));
+        }
+        setHasAskedQuestion(true);
       } else {
         throw new Error(res.error || 'No answer received from adviser');
       }
@@ -111,7 +165,9 @@ export const Chat = () => {
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">AI Financial Adviser</h2>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              AI Financial Adviser
+            </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Personalized guidance based on your live balances, cash flow, and budgets
             </p>
@@ -128,24 +184,26 @@ export const Chat = () => {
               key={m.id}
               className={`flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}
             >
+              {/* Avatar */}
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
                   isUser
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md'
+                    ? 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white'
+                    : 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white'
                 }`}
               >
                 {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
               </div>
 
+              {/* Message Bubble */}
               <div
-                className={`max-w-[82%] rounded-2xl p-4 text-sm leading-relaxed whitespace-pre-line shadow-sm ${
+                className={`max-w-[85%] rounded-2xl p-4 shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${
                   isUser
                     ? 'bg-blue-600 text-white rounded-tr-none'
-                    : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700/60 rounded-tl-none'
+                    : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700/60 rounded-tl-none'
                 }`}
               >
-                {m.content}
+                {cleanText(m.content)}
                 <div
                   className={`text-[10px] mt-2 font-medium ${
                     isUser ? 'text-blue-100 text-right' : 'text-gray-400 dark:text-gray-500'
@@ -193,21 +251,36 @@ export const Chat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Example Question Buttons */}
+      {/* Dynamic Recommended Follow-up Question Buttons */}
       <div className="py-2">
         <div className="flex items-center space-x-1.5 text-xs text-gray-500 dark:text-gray-400 mb-1.5">
-          <HelpCircle className="w-3.5 h-3.5" />
-          <span>Try asking:</span>
+          {hasAskedQuestion ? (
+            <>
+              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                Suggested follow-up questions:
+              </span>
+            </>
+          ) : (
+            <>
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Try asking:</span>
+            </>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
-          {EXAMPLE_QUESTIONS.map((q) => (
+          {suggestedQuestions.map((q) => (
             <button
               key={q}
               onClick={() => handleSend(q)}
               disabled={loading}
-              className="text-xs px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition disabled:opacity-50 text-left"
+              className={`text-xs px-3 py-1.5 rounded-full border transition disabled:opacity-50 text-left shadow-sm ${
+                hasAskedQuestion
+                  ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/40 hover:border-emerald-500'
+                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/20'
+              }`}
             >
-              "{q}"
+              "{cleanText(q)}"
             </button>
           ))}
         </div>
@@ -227,20 +300,19 @@ export const Chat = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask your financial question... (e.g. Can I afford a 20,000 phone?)"
+            className="flex-1 max-h-32 min-h-[44px] p-2.5 bg-transparent resize-none border-0 focus:ring-0 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none"
             rows={1}
             disabled={loading}
-            className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none resize-none max-h-24 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="p-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition flex-shrink-0"
-            title="Send Message"
+            className="p-2.5 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </button>
         </form>
-        <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center mt-1.5">
+        <p className="text-[10px] text-center text-gray-400 dark:text-gray-500 mt-2">
           FinSense Adviser uses summarized figures. This is not professional financial advice.
         </p>
       </div>

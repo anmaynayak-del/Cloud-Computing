@@ -218,7 +218,7 @@ export const Dashboard = () => {
             </div>
             <div>
               <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">AI Insights</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Smart financial analysis powered by Gemini</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Smart financial analysis & spending patterns</p>
             </div>
           </div>
           <button
@@ -235,7 +235,7 @@ export const Dashboard = () => {
         {insightsLoading && !insights ? (
           <div className="py-8 text-center space-y-3">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Analyzing your financial patterns with Gemini AI...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Analyzing your financial patterns...</p>
           </div>
         ) : insightsError ? (
           <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start space-x-3">

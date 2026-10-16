@@ -566,7 +566,7 @@ export const Transactions = () => {
                   onClick={handleSuggestCategory}
                   disabled={suggestLoading}
                   className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center space-x-1 font-medium disabled:opacity-50"
-                  title="Auto-suggest category using Gemini AI"
+                  title="Auto-suggest category using AI"
                 >
                   <Sparkles className={`w-3 h-3 ${suggestLoading ? 'animate-spin' : ''}`} />
                   <span>{suggestLoading ? 'Suggesting...' : 'Suggest'}</span>

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { getApiUrl } from '../lib/api';
 
 type User = {
   id: string;
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/auth/me', { credentials: 'include' })
+    fetch(getApiUrl('/api/auth/me'), { credentials: 'include' })
       .then(res => {
         if (res.ok) return res.json();
         throw new Error('Not logged in');
