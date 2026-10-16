@@ -14,7 +14,7 @@ export function proxy(request: NextRequest) {
       isAllowed = true;
     }
   } else {
-    if (origin.includes('localhost') || origin.endsWith('.vercel.app')) {
+    if (origin.includes('localhost') || origin.endsWith('.vercel.app') || origin.endsWith('.pages.dev')) {
       isAllowed = true;
     }
   }
