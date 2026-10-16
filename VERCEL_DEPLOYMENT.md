@@ -58,7 +58,8 @@ postgresql://user:password@ep-cool-fog-123456.us-east-2.aws.neon.tech/finsense?s
    - **Framework Preset**: `Next.js`
    - **Root Directory**: Click **Edit** and select **`server`**.
 4. Expand **Environment Variables** and add:
-   - `DATABASE_URL`: Your PostgreSQL connection string.
+   - `DATABASE_URL`: Your Supabase transaction pooler connection string (Port 6543, `?pgbouncer=true`).
+   - `DIRECT_URL`: Your Supabase session connection string (Port 5432).
    - `JWT_SECRET`: A random secure string (e.g. `openssl rand -hex 32` or any random 32+ character string).
    - `GEMINI_API_KEY`: *(Optional)* Your Google Gemini API key from Google AI Studio.
    - `CLIENT_ORIGIN`: Your client's Vercel URL (e.g. `https://finsense.vercel.app`). *Tip: You can add or update this after deploying the client.*
