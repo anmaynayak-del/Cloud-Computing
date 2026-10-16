@@ -23,7 +23,16 @@ export async function POST(request: Request) {
 
     const { email, password } = parsed.data;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email },
+          { name: email },
+          { email: email.toLowerCase() },
+          { email: `${email}@example.com` },
+        ],
+      },
+    });
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }

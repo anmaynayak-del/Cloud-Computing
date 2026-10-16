@@ -25,8 +25,8 @@ export const Login = () => {
   const navigate = useNavigate();
 
   const handleDemoFill = () => {
-    setEmail('test@example.com');
-    setPassword('password123');
+    setEmail('name');
+    setPassword('demo123');
     setError('');
   };
 
@@ -134,21 +134,21 @@ export const Login = () => {
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email Field */}
+          {/* Username or Email Field */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-              Email Address
+              Username or Email
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <Mail className="w-4 h-4" />
               </div>
               <input
-                type="email"
+                type="text"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                placeholder="name@example.com"
+                placeholder="name or name@example.com"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700/80 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-150"
               />
             </div>
@@ -191,7 +191,7 @@ export const Login = () => {
               className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Use Demo Credentials
+              Use Demo Credentials (name / demo123)
             </button>
           </div>
 
