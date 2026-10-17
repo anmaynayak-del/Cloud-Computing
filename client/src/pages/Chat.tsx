@@ -248,46 +248,48 @@ export const Chat = () => {
           </div>
         )}
 
+        {/* Dynamic Recommended Follow-up Question Buttons */}
+        {!loading && suggestedQuestions.length > 0 && (
+          <div className="pt-2 pb-1">
+            <div className="flex items-center space-x-1.5 text-xs text-gray-500 dark:text-gray-400 mb-2">
+              {hasAskedQuestion ? (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                    Suggested follow-up questions:
+                  </span>
+                </>
+              ) : (
+                <>
+                  <HelpCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>Try asking:</span>
+                </>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {suggestedQuestions.map((q) => (
+                <button
+                  key={q}
+                  onClick={() => handleSend(q)}
+                  disabled={loading}
+                  className={`text-xs px-3.5 py-1.5 rounded-xl sm:rounded-full border transition disabled:opacity-50 text-left shadow-sm cursor-pointer ${
+                    hasAskedQuestion
+                      ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/40 hover:border-emerald-500'
+                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/20'
+                  }`}
+                >
+                  "{cleanText(q)}"
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Dynamic Recommended Follow-up Question Buttons */}
-      <div className="py-2 flex-shrink-0">
-        <div className="flex items-center space-x-1.5 text-xs text-gray-500 dark:text-gray-400 mb-1.5">
-          {hasAskedQuestion ? (
-            <>
-              <Sparkles className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400 truncate">
-                Suggested follow-up questions:
-              </span>
-            </>
-          ) : (
-            <>
-              <HelpCircle className="w-3.5 h-3.5 shrink-0" />
-              <span>Try asking:</span>
-            </>
-          )}
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1.5 sm:flex-wrap scrollbar-none">
-          {suggestedQuestions.map((q) => (
-            <button
-              key={q}
-              onClick={() => handleSend(q)}
-              disabled={loading}
-              className={`text-xs px-3 py-1.5 rounded-full border transition disabled:opacity-50 text-left shadow-sm shrink-0 sm:shrink cursor-pointer whitespace-nowrap sm:whitespace-normal ${
-                hasAskedQuestion
-                  ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/40 hover:border-emerald-500'
-                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/20'
-              }`}
-            >
-              "{cleanText(q)}"
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Input Form */}
-      <div className="pt-2">
+      <div className="pt-2 flex-shrink-0">
         <form
           onSubmit={(e) => {
             e.preventDefault();
