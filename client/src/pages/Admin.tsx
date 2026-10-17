@@ -330,7 +330,7 @@ export const Admin = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                   {recentUsers.map((u) => (
-                    <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition">
+                    <tr key={u.id} className="hover:bg-gray-100/70 dark:hover:bg-gray-800/80 transition-colors">
                       <td className="py-3 font-medium text-gray-900 dark:text-gray-100">
                         <div>{u.name || 'Anonymous User'}</div>
                         <div className="text-xs text-gray-400">{u.email}</div>
@@ -389,7 +389,7 @@ export const Admin = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-750 text-gray-500 dark:text-gray-400 text-xs uppercase border-b border-gray-200 dark:border-gray-700">
+                  <tr className="bg-gray-100/70 dark:bg-gray-900/90 text-gray-500 dark:text-gray-400 text-xs uppercase border-b border-gray-200 dark:border-gray-800">
                     <th className="p-4 font-semibold">User Details</th>
                     <th className="p-4 font-semibold">Role</th>
                     <th className="p-4 font-semibold">Net Balance</th>
@@ -398,9 +398,9 @@ export const Admin = () => {
                     <th className="p-4 font-semibold text-right">Administrative Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {usersList.map((u) => (
-                    <tr key={u.id} className="hover:bg-gray-50/70 dark:hover:bg-gray-750/50 transition">
+                    <tr key={u.id} className="hover:bg-gray-100/70 dark:hover:bg-gray-800/80 transition-colors">
                       <td className="p-4 font-medium text-gray-900 dark:text-gray-100">
                         <div className="font-bold">{u.name}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">{u.email}</div>
@@ -490,9 +490,9 @@ export const Admin = () => {
                     <th className="pb-3 font-semibold text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {aiLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition text-xs">
+                    <tr key={log.id} className="hover:bg-gray-100/70 dark:hover:bg-gray-800/80 transition-colors text-xs">
                       <td className="py-2.5 text-gray-500">{new Date(log.createdAt).toLocaleTimeString()}</td>
                       <td className="py-2.5 font-mono text-gray-700 dark:text-gray-300">{log.endpoint}</td>
                       <td className="py-2.5 text-gray-500">{log.model || 'gemini'}</td>
@@ -537,7 +537,7 @@ export const Admin = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-750 text-gray-500 dark:text-gray-400 text-xs uppercase border-b border-gray-200 dark:border-gray-700">
+                  <tr className="bg-gray-100/70 dark:bg-gray-900/90 text-gray-500 dark:text-gray-400 text-xs uppercase border-b border-gray-200 dark:border-gray-800">
                     <th className="p-4 font-semibold">Timestamp</th>
                     <th className="p-4 font-semibold">Action</th>
                     <th className="p-4 font-semibold">Actor / User</th>
@@ -545,9 +545,9 @@ export const Admin = () => {
                     <th className="p-4 font-semibold text-right">IP Address</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {auditLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50/70 dark:hover:bg-gray-750/50 transition text-xs">
+                    <tr key={log.id} className="hover:bg-gray-100/70 dark:hover:bg-gray-800/80 transition-colors text-xs">
                       <td className="p-4 text-gray-500 whitespace-nowrap">
                         {new Date(log.createdAt).toLocaleString()}
                       </td>

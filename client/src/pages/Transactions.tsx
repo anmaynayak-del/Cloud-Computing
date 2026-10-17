@@ -444,7 +444,7 @@ export const Transactions = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-750 border-b dark:border-gray-700">
+                <tr className="bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-700">
                   <th className="p-4 font-medium text-xs text-gray-500 uppercase">Date</th>
                   <th className="p-4 font-medium text-xs text-gray-500 uppercase">Description</th>
                   <th className="p-4 font-medium text-xs text-gray-500 uppercase">Account</th>
@@ -668,7 +668,7 @@ export const Transactions = () => {
               </div>
 
               {/* Column Mapping Selectors */}
-              <div className="p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-750/50 rounded-xl space-y-3 border dark:border-gray-700">
+              <div className="p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-800/60 rounded-xl space-y-3 border dark:border-gray-700">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   Detected Column Mapping (adjust if needed)
                 </h4>
@@ -752,7 +752,7 @@ export const Transactions = () => {
                 </div>
                 <div className="border dark:border-gray-700 rounded-lg overflow-x-auto text-xs">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-100 dark:bg-gray-750 border-b dark:border-gray-700">
+                    <thead className="bg-gray-100 dark:bg-gray-700/50 border-b dark:border-gray-700">
                       <tr>
                         <th className="p-2 font-medium whitespace-nowrap">Date</th>
                         <th className="p-2 font-medium whitespace-nowrap">Description</th>
