@@ -103,20 +103,20 @@ export const Goals = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold">Savings Goals</h1>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Track your progress towards important financial milestones</p>
         </div>
         <button
           onClick={openAddModal}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm"
+          className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm cursor-pointer"
         >
           Add Goal
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {loading ? (
           <>
             <CardSkeleton />
@@ -140,26 +140,26 @@ export const Goals = () => {
             const percentage = Math.min((saved / target) * 100, 100);
 
             return (
-              <div key={g.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-4">
-                <div className="flex justify-between">
-                  <h3 className="font-semibold text-lg">{g.name}</h3>
-                  <div className="space-x-2 text-sm">
-                    <button onClick={() => openEditModal(g)} className="text-blue-500 hover:underline">Edit</button>
-                    <button onClick={() => handleDelete(g.id)} className="text-red-500 hover:underline">Delete</button>
+              <div key={g.id} className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 space-y-4 min-w-0">
+                <div className="flex justify-between items-start gap-2">
+                  <h3 className="font-semibold text-base sm:text-lg text-gray-900 dark:text-gray-100 truncate">{g.name}</h3>
+                  <div className="space-x-2 text-sm shrink-0">
+                    <button onClick={() => openEditModal(g)} className="text-blue-500 hover:underline cursor-pointer">Edit</button>
+                    <button onClick={() => handleDelete(g.id)} className="text-red-500 hover:underline cursor-pointer">Delete</button>
                   </div>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Target: {formatINR(target, 0)}</span>
-                  <span className="text-blue-600 font-medium">{percentage.toFixed(1)}%</span>
+                  <span className="text-gray-500 truncate">Target: {formatINR(target, 0)}</span>
+                  <span className="text-blue-600 font-medium shrink-0 ml-2">{percentage.toFixed(1)}%</span>
                 </div>
                 <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div className="h-full bg-blue-500 transition-all" style={{ width: `${percentage}%` }}></div>
                 </div>
-                <div className="text-sm text-gray-500 flex justify-between items-center">
-                  <span>{formatINR(saved, 0)} saved</span>
-                  <span>Due: {new Date(g.deadline).toLocaleDateString()}</span>
+                <div className="text-sm text-gray-500 flex justify-between items-center gap-2">
+                  <span className="truncate">{formatINR(saved, 0)} saved</span>
+                  <span className="shrink-0 text-xs sm:text-sm">Due: {new Date(g.deadline).toLocaleDateString()}</span>
                 </div>
-                <button onClick={() => handleAddMoney(g)} className="w-full mt-2 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm">
+                <button onClick={() => handleAddMoney(g)} className="w-full mt-2 py-2 border border-blue-600 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm font-medium transition cursor-pointer">
                   Add Money
                 </button>
               </div>
@@ -171,24 +171,24 @@ export const Goals = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingId ? "Edit Goal" : "Add Goal"}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Goal Name</label>
-            <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full px-3 py-2 border dark:border-gray-600 rounded-md bg-transparent" />
+            <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-1">Goal Name</label>
+            <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Target Amount (₹)</label>
-              <input type="number" step="0.01" min="1" required value={targetAmount} onChange={e => setTargetAmount(e.target.value)} className="w-full px-3 py-2 border dark:border-gray-600 rounded-md bg-transparent" />
+              <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-1">Target Amount (₹)</label>
+              <input type="number" step="0.01" min="1" required value={targetAmount} onChange={e => setTargetAmount(e.target.value)} className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent font-medium" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Saved Amount (₹)</label>
-              <input type="number" step="0.01" min="0" required value={savedAmount} onChange={e => setSavedAmount(e.target.value)} className="w-full px-3 py-2 border dark:border-gray-600 rounded-md bg-transparent" />
+              <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-1">Saved Amount (₹)</label>
+              <input type="number" step="0.01" min="0" required value={savedAmount} onChange={e => setSavedAmount(e.target.value)} className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent font-medium" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Deadline</label>
-            <input type="date" required value={deadline} onChange={e => setDeadline(e.target.value)} className="w-full px-3 py-2 border dark:border-gray-600 rounded-md bg-transparent" />
+            <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-1">Deadline</label>
+            <input type="date" required value={deadline} onChange={e => setDeadline(e.target.value)} className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent" />
           </div>
-          <button type="submit" className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Goal</button>
+          <button type="submit" className="w-full py-2.5 bg-blue-600 text-white font-medium text-sm rounded-lg hover:bg-blue-700 transition shadow-sm cursor-pointer">Save Goal</button>
         </form>
       </Modal>
     </div>

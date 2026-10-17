@@ -62,20 +62,20 @@ export const Budgets = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold">Monthly Budgets</h1>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Control category spending and stay within your limits</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm"
+          className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm cursor-pointer"
         >
           Set Budget
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {loading ? (
           <>
             <CardSkeleton />
@@ -98,11 +98,11 @@ export const Budgets = () => {
             const colorClass = percentage >= 100 ? 'bg-red-500' : percentage >= 80 ? 'bg-orange-500' : 'bg-green-500';
 
             return (
-              <div key={b.category.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">{b.category.name}</h3>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">{formatINR(b.spent, 0)} / {formatINR(b.budgeted, 0)}</span>
+              <div key={b.category.id} className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 space-y-4 min-w-0">
+                <div className="flex justify-between items-start gap-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{b.category.name}</h3>
+                  <div className="flex items-center space-x-2 shrink-0">
+                    <span className="text-xs sm:text-sm text-gray-500">{formatINR(b.spent, 0)} / {formatINR(b.budgeted, 0)}</span>
                     <button onClick={async () => {
                       if (!confirm('Delete this budget?')) return;
                       try {
@@ -110,13 +110,13 @@ export const Budgets = () => {
                         toast.success('Budget deleted');
                         loadData();
                       } catch (e: any) { toast.error(e.message); }
-                    }} className="text-red-500 hover:text-red-700 text-sm ml-2">X</button>
+                    }} className="text-red-500 hover:text-red-700 text-xs sm:text-sm font-semibold p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded cursor-pointer">✕</button>
                   </div>
                 </div>
                 <div className="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div className={`h-full ${colorClass} transition-all`} style={{ width: `${percentage}%` }}></div>
                 </div>
-                <div className="text-xs text-right text-gray-500">
+                <div className="text-xs text-right text-gray-500 truncate">
                   {b.remaining >= 0 ? `${formatINR(b.remaining, 0)} remaining` : `${formatINR(Math.abs(b.remaining), 0)} over budget`}
                 </div>
               </div>

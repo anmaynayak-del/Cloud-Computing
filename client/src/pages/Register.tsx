@@ -105,7 +105,7 @@ export const Register = () => {
       </div>
 
       {/* Centered Glassmorphism Card */}
-      <div className="relative z-10 w-full max-w-md p-8 sm:p-10 rounded-3xl bg-slate-900/70 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+      <div className="relative z-10 w-full max-w-md p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl bg-slate-900/70 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
         
         {/* Brand Header */}
         <div className="text-center space-y-2 mb-8">

@@ -9,6 +9,9 @@ import { Transactions } from './pages/Transactions';
 import { Budgets } from './pages/Budgets';
 import { Goals } from './pages/Goals';
 import { Chat } from './pages/Chat';
+import { Profile } from './pages/Profile';
+import { Subscriptions } from './pages/Subscriptions';
+import { Admin } from './pages/Admin';
 
 import { Toaster } from 'react-hot-toast';
 import { Accounts } from './pages/Accounts';
@@ -31,8 +34,11 @@ function App() {
                 <Route path="/accounts" element={<Accounts />} />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/budgets" element={<Budgets />} />
+                <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/goals" element={<Goals />} />
                 <Route path="/chat" element={<Chat />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/admin" element={<Admin />} />
               </Route>
             </Route>
 

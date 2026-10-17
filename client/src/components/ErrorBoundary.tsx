@@ -55,17 +55,17 @@ export class ErrorBoundary extends Component<Props, State> {
               </div>
             )}
 
-            <div className="flex justify-center space-x-3 pt-2">
+            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:space-x-3 pt-2">
               <button
                 onClick={this.handleReset}
-                className="flex items-center space-x-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition"
+                className="flex items-center justify-center space-x-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition w-full sm:w-auto cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Try Again</span>
               </button>
               <a
                 href="/"
-                className="flex items-center space-x-1.5 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-xs font-medium rounded-lg transition"
+                className="flex items-center justify-center space-x-1.5 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-xs font-medium rounded-lg transition w-full sm:w-auto"
               >
                 <Home className="w-3.5 h-3.5" />
                 <span>Dashboard</span>

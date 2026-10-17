@@ -16,10 +16,10 @@ export const NotFound = () => {
           </p>
         </div>
 
-        <div className="flex justify-center space-x-3 pt-2">
+        <div className="flex flex-col sm:flex-row justify-center gap-2.5 sm:space-x-3 pt-2">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center space-x-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+            className="flex items-center justify-center space-x-2 px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition w-full sm:w-auto cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Go Back</span>
@@ -27,7 +27,7 @@ export const NotFound = () => {
 
           <Link
             to="/"
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition shadow-sm"
+            className="flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition shadow-sm w-full sm:w-auto"
           >
             <Home className="w-4 h-4" />
             <span>Go to Dashboard</span>

@@ -83,20 +83,20 @@ export const Accounts = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold">Accounts</h1>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Manage your bank accounts, credit cards, and investments</p>
         </div>
         <button
           onClick={openAddModal}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm"
+          className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm cursor-pointer"
         >
           Add Account
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {loading ? (
           <>
             <CardSkeleton />
@@ -120,11 +120,11 @@ export const Accounts = () => {
             return (
               <div
                 key={a.id}
-                className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 space-y-3 relative group"
+                className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 space-y-3 relative group min-w-0"
               >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{a.name}</h3>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-base sm:text-lg text-gray-900 dark:text-gray-100 truncate">{a.name}</h3>
                     <div className="flex items-center space-x-2 mt-0.5">
                       <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full font-medium">
                         {a.type}
@@ -136,17 +136,17 @@ export const Accounts = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-1 opacity-80 group-hover:opacity-100 transition">
+                  <div className="flex items-center space-x-1 opacity-80 group-hover:opacity-100 transition shrink-0">
                     <button
                       onClick={() => openEditModal(a)}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition"
+                      className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition cursor-pointer"
                       title="Edit account"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(a.id, a.name)}
-                      className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded transition"
+                      className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded transition cursor-pointer"
                       title="Delete account"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -156,7 +156,7 @@ export const Accounts = () => {
 
                 <div className="pt-2 border-t dark:border-gray-700/50">
                   <div className="text-xs text-gray-400">Current Balance</div>
-                  <div className={`text-2xl font-bold ${isDebt ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                  <div className={`text-xl sm:text-2xl font-bold truncate ${isDebt ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}`}>
                     {formatINR(a.balance)}
                   </div>
                 </div>

@@ -12,7 +12,7 @@ export const Skeleton = ({ className = '' }: SkeletonProps) => {
 
 export const CardSkeleton = () => {
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-3">
+    <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow space-y-3">
       <Skeleton className="h-4 w-28" />
       <Skeleton className="h-8 w-40" />
       <Skeleton className="h-3 w-20" />

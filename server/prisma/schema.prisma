@@ -14,6 +14,7 @@ model User {
   email        String        @unique
   passwordHash String
   name         String?
+  role         String        @default("USER") // "USER" or "ADMIN"
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   accounts     Account[]
@@ -21,6 +22,7 @@ model User {
   insights     Insight[]
   categories   Category[]
   goals        Goal[]
+  auditLogs    AuditLog[]
 }
 
 model Account {
@@ -105,4 +107,38 @@ model Category {
   budgets      Budget[]
 
   @@unique([userId, name, type])
+}
+
+model AuditLog {
+  id           String        @id @default(uuid())
+  userId       String?
+  action       String        // e.g. "ADMIN_LOGIN", "INSPECT_USER", "EXPORT_DATA", "USER_REGISTER"
+  details      String?
+  targetUserId String?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime      @default(now())
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model AiUsageLog {
+  id               String        @id @default(uuid())
+  userId           String?
+  endpoint         String        // e.g. "/api/ai/chat", "/api/ai/advisor"
+  promptTokens     Int?          @default(0)
+  completionTokens Int?          @default(0)
+  totalTokens      Int?          @default(0)
+  latencyMs        Int?          @default(0)
+  model            String?
+  status           String        @default("SUCCESS") // "SUCCESS" or "ERROR"
+  errorMessage     String?
+  createdAt        DateTime      @default(now())
+
+  @@index([userId])
+  @@index([endpoint])
+  @@index([createdAt])
 }

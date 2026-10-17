@@ -6,6 +6,7 @@ import { TableRowSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import toast from 'react-hot-toast';
 import { Sparkles, Upload, FileText, ArrowUpDown, CheckCircle } from 'lucide-react';
+import { DataExporter } from '../components/DataExporter';
 
 interface ParsedCSV {
   headers: string[];
@@ -364,22 +365,23 @@ export const Transactions = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold">Transactions</h1>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Manage and track your account activity</p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2.5 sm:space-x-3">
+          <DataExporter />
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg flex items-center space-x-2 transition shadow-sm"
+            className="flex-1 sm:flex-initial px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg flex items-center justify-center space-x-2 transition shadow-sm cursor-pointer"
           >
             <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <span>Import CSV</span>
           </button>
           <button
             onClick={openAddModal}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm"
+            className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm cursor-pointer"
           >
             Add Transaction
           </button>
@@ -387,18 +389,18 @@ export const Transactions = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <input
           type="text"
           placeholder="Search descriptions..."
           value={search}
           onChange={e => { setSearch(e.target.value); setPage(1); }}
-          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent focus:ring-2 focus:ring-blue-500 outline-none"
+          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent focus:ring-2 focus:ring-blue-500 outline-none w-full"
         />
         <select
           value={filterType}
           onChange={e => { setFilterType(e.target.value); setPage(1); }}
-          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent"
+          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent w-full"
         >
           <option value="">All Types</option>
           <option value="EXPENSE">Expense</option>
@@ -407,7 +409,7 @@ export const Transactions = () => {
         <select
           value={filterAccount}
           onChange={e => { setFilterAccount(e.target.value); setPage(1); }}
-          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent"
+          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent w-full"
         >
           <option value="">All Accounts</option>
           {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -415,7 +417,7 @@ export const Transactions = () => {
         <select
           value={filterCategory}
           onChange={e => { setFilterCategory(e.target.value); setPage(1); }}
-          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent"
+          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent w-full"
         >
           <option value="">All Categories</option>
           {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -425,14 +427,14 @@ export const Transactions = () => {
           value={startDate}
           onChange={e => { setStartDate(e.target.value); setPage(1); }}
           title="Start Date"
-          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent"
+          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent w-full"
         />
         <input
           type="date"
           value={endDate}
           onChange={e => { setEndDate(e.target.value); setPage(1); }}
           title="End Date"
-          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent"
+          className="px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent w-full"
         />
       </div>
 
@@ -538,7 +540,7 @@ export const Transactions = () => {
       {/* Add / Edit Transaction Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingId ? "Edit Transaction" : "Add Transaction"}>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-1">Type</label>
               <select value={type} onChange={e => setType(e.target.value)} className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent">
@@ -551,7 +553,7 @@ export const Transactions = () => {
               <input type="date" required value={date} onChange={e => setDate(e.target.value)} className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-1">Account</label>
               <select value={accountId} onChange={e => setAccountId(e.target.value)} required className="w-full px-3 py-2 text-sm border dark:border-gray-600 rounded-lg bg-transparent">
@@ -609,10 +611,11 @@ export const Transactions = () => {
       </Modal>
 
       {/* CSV Import Modal */}
-      <Modal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} title="Import Bank Statement CSV">
+      {/* CSV Import Modal */}
+      <Modal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} title="Import Bank Statement CSV" maxWidth="max-w-2xl">
         <div className="space-y-5">
           {!csvFile ? (
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition cursor-pointer relative">
+            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 sm:p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition cursor-pointer relative">
               <input
                 type="file"
                 accept=".csv,text/csv"
@@ -635,14 +638,14 @@ export const Transactions = () => {
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span className="text-xs font-semibold text-blue-900 dark:text-blue-200">{csvFile.name}</span>
-                  <span className="text-xs text-blue-600 dark:text-blue-400">({parsedData.rows.length} rows found)</span>
+                <div className="flex items-center space-x-2 min-w-0 pr-2">
+                  <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span className="text-xs font-semibold text-blue-900 dark:text-blue-200 truncate">{csvFile.name}</span>
+                  <span className="text-xs text-blue-600 dark:text-blue-400 shrink-0">({parsedData.rows.length} rows)</span>
                 </div>
                 <button
                   onClick={() => { setCsvFile(null); setParsedData({ headers: [], rows: [] }); }}
-                  className="text-xs text-red-500 hover:underline font-medium"
+                  className="text-xs text-red-500 hover:underline font-medium shrink-0"
                 >
                   Change file
                 </button>
@@ -665,11 +668,11 @@ export const Transactions = () => {
               </div>
 
               {/* Column Mapping Selectors */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-750/50 rounded-xl space-y-3 border dark:border-gray-700">
+              <div className="p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-750/50 rounded-xl space-y-3 border dark:border-gray-700">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   Detected Column Mapping (adjust if needed)
                 </h4>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Date Column *</label>
                     <select
@@ -714,7 +717,7 @@ export const Transactions = () => {
                 </div>
 
                 {!typeCol && (
-                  <div className="pt-2 flex items-center space-x-3 text-xs">
+                  <div className="pt-2 flex flex-wrap items-center gap-3 text-xs">
                     <span className="text-gray-500">Default direction for unclassified rows:</span>
                     <label className="inline-flex items-center space-x-1 cursor-pointer">
                       <input
@@ -738,23 +741,23 @@ export const Transactions = () => {
 
               {/* Preview Table */}
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                     Preview (First 5 Rows)
                   </h4>
                   <span className="text-[11px] text-gray-400 flex items-center space-x-1">
-                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <CheckCircle className="w-3 h-3 text-green-500 shrink-0" />
                     <span>Duplicates will be automatically skipped</span>
                   </span>
                 </div>
-                <div className="border dark:border-gray-700 rounded-lg overflow-hidden text-xs">
+                <div className="border dark:border-gray-700 rounded-lg overflow-x-auto text-xs">
                   <table className="w-full text-left">
                     <thead className="bg-gray-100 dark:bg-gray-750 border-b dark:border-gray-700">
                       <tr>
-                        <th className="p-2 font-medium">Date</th>
-                        <th className="p-2 font-medium">Description</th>
-                        <th className="p-2 font-medium">Amount</th>
-                        <th className="p-2 font-medium">Type</th>
+                        <th className="p-2 font-medium whitespace-nowrap">Date</th>
+                        <th className="p-2 font-medium whitespace-nowrap">Description</th>
+                        <th className="p-2 font-medium whitespace-nowrap">Amount</th>
+                        <th className="p-2 font-medium whitespace-nowrap">Type</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y dark:divide-gray-700 bg-white dark:bg-gray-800">
@@ -763,7 +766,7 @@ export const Transactions = () => {
                           <td className="p-2 whitespace-nowrap text-gray-600 dark:text-gray-300">{row.date}</td>
                           <td className="p-2 truncate max-w-[180px] font-medium">{row.description}</td>
                           <td className="p-2 font-semibold whitespace-nowrap">{formatINR(row.amount)}</td>
-                          <td className="p-2">
+                          <td className="p-2 whitespace-nowrap">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${row.type === 'INCOME' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
                               {row.type}
                             </span>
@@ -775,11 +778,11 @@ export const Transactions = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end space-x-3">
+              <div className="pt-2 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:space-x-3">
                 <button
                   type="button"
                   onClick={() => setIsImportModalOpen(false)}
-                  className="px-4 py-2 border dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  className="w-full sm:w-auto px-4 py-2 border dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                 >
                   Cancel
                 </button>
@@ -787,7 +790,7 @@ export const Transactions = () => {
                   type="button"
                   onClick={handleSaveImport}
                   disabled={isImporting}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition shadow-sm disabled:opacity-50"
+                  className="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition shadow-sm disabled:opacity-50"
                 >
                   {isImporting ? 'Importing...' : `Import ${parsedData.rows.length} Transactions`}
                 </button>

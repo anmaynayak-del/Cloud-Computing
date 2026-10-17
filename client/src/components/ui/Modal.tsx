@@ -6,9 +6,10 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
+  maxWidth?: string;
 }
 
-export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-md' }: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,18 +35,18 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity" onClick={handleOutsideClick}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 transition-opacity" onClick={handleOutsideClick}>
       <div 
         ref={modalRef} 
-        className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className={`w-full ${maxWidth} max-h-[calc(100dvh-2rem)] flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-gray-100 dark:border-gray-700`}
       >
-        <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md transition-colors">
+        <div className="flex justify-between items-center px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 truncate pr-2">{title}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60 p-1.5 rounded-lg transition-colors cursor-pointer" aria-label="Close modal">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-4">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 overscroll-contain">
           {children}
         </div>
       </div>

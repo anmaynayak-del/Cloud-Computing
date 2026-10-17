@@ -20,7 +20,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
 }) => {
   return (
     <div
-      className={`p-10 text-center bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 flex flex-col items-center justify-center space-y-3 ${className}`}
+      className={`p-6 sm:p-10 text-center bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 flex flex-col items-center justify-center space-y-3 ${className}`}
     >
       <div className="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl">
         <Icon className="w-8 h-8" />

@@ -5,6 +5,7 @@ import { signToken } from '../../../../lib/auth';
 import { rateLimit } from '../../../../lib/rate-limit';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
+import { logAuditEvent } from '../../../../lib/audit';
 
 export async function POST(request: Request) {
   try {
@@ -52,6 +53,16 @@ export async function POST(request: Request) {
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
+
+    if (user.role === 'ADMIN') {
+      await logAuditEvent({
+        userId: user.id,
+        action: 'ADMIN_LOGIN',
+        details: { email: user.email, name: user.name, role: user.role },
+        ipAddress: ip,
+        userAgent: request.headers.get('user-agent'),
+      });
+    }
 
     const { passwordHash: _, ...userWithoutPassword } = user;
     return NextResponse.json(userWithoutPassword, { status: 200 });

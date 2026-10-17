@@ -157,18 +157,18 @@ export const Chat = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-8rem)]">
+    <div className="max-w-4xl mx-auto flex flex-col h-[calc(100dvh-7.5rem)] sm:h-[calc(100vh-8rem)]">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
-        <div className="flex items-center space-x-3">
-          <div className="p-2.5 bg-blue-100 dark:bg-blue-900/50 rounded-xl text-blue-600 dark:text-blue-400">
-            <Sparkles className="w-6 h-6" />
+      <div className="flex items-center justify-between pb-3 sm:pb-4 border-b dark:border-gray-700 flex-shrink-0">
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="p-2 sm:p-2.5 bg-blue-100 dark:bg-blue-900/50 rounded-xl text-blue-600 dark:text-blue-400 shrink-0">
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">
               AI Financial Adviser
             </h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
               Personalized guidance based on your live balances, cash flow, and budgets
             </p>
           </div>
@@ -176,28 +176,28 @@ export const Chat = () => {
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-4 pr-1">
+      <div className="flex-1 overflow-y-auto py-3 sm:py-4 space-y-4 pr-1 min-h-0">
         {messages.map((m) => {
           const isUser = m.role === 'user';
           return (
             <div
               key={m.id}
-              className={`flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}
+              className={`flex items-start space-x-2.5 sm:space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}
             >
               {/* Avatar */}
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
                   isUser
                     ? 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white'
                     : 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white'
                 }`}
               >
-                {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                {isUser ? <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
               </div>
 
               {/* Message Bubble */}
               <div
-                className={`max-w-[85%] rounded-2xl p-4 shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${
+                className={`max-w-[88%] sm:max-w-[85%] rounded-2xl p-3 sm:p-4 shadow-sm text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words ${
                   isUser
                     ? 'bg-blue-600 text-white rounded-tr-none'
                     : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700/60 rounded-tl-none'
@@ -205,7 +205,7 @@ export const Chat = () => {
               >
                 {cleanText(m.content)}
                 <div
-                  className={`text-[10px] mt-2 font-medium ${
+                  className={`text-[10px] mt-1.5 sm:mt-2 font-medium ${
                     isUser ? 'text-blue-100 text-right' : 'text-gray-400 dark:text-gray-500'
                   }`}
                 >
@@ -218,11 +218,11 @@ export const Chat = () => {
 
         {/* Loading Indicator */}
         {loading && (
-          <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-md">
-              <Bot className="w-4 h-4 animate-pulse" />
+          <div className="flex items-start space-x-2.5 sm:space-x-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-md">
+              <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse" />
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/60 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center space-x-2">
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/60 rounded-2xl rounded-tl-none p-3.5 sm:p-4 shadow-sm flex items-center space-x-2">
               <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce"></div>
               <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]"></div>
               <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.3s]"></div>
@@ -252,29 +252,29 @@ export const Chat = () => {
       </div>
 
       {/* Dynamic Recommended Follow-up Question Buttons */}
-      <div className="py-2">
+      <div className="py-2 flex-shrink-0">
         <div className="flex items-center space-x-1.5 text-xs text-gray-500 dark:text-gray-400 mb-1.5">
           {hasAskedQuestion ? (
             <>
-              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400 truncate">
                 Suggested follow-up questions:
               </span>
             </>
           ) : (
             <>
-              <HelpCircle className="w-3.5 h-3.5" />
+              <HelpCircle className="w-3.5 h-3.5 shrink-0" />
               <span>Try asking:</span>
             </>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1.5 sm:flex-wrap scrollbar-none">
           {suggestedQuestions.map((q) => (
             <button
               key={q}
               onClick={() => handleSend(q)}
               disabled={loading}
-              className={`text-xs px-3 py-1.5 rounded-full border transition disabled:opacity-50 text-left shadow-sm ${
+              className={`text-xs px-3 py-1.5 rounded-full border transition disabled:opacity-50 text-left shadow-sm shrink-0 sm:shrink cursor-pointer whitespace-nowrap sm:whitespace-normal ${
                 hasAskedQuestion
                   ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/40 hover:border-emerald-500'
                   : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/20'

@@ -6,6 +6,8 @@ import { rateLimit } from '../../../../lib/rate-limit';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 
+import { logAuditEvent } from '../../../../lib/audit';
+
 export async function POST(request: Request) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'global';
@@ -29,7 +31,15 @@ export async function POST(request: Request) {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
-      data: { email, name, passwordHash },
+      data: { email, name, passwordHash, role: 'USER' },
+    });
+
+    await logAuditEvent({
+      userId: user.id,
+      action: 'USER_REGISTER',
+      details: { email: user.email, name: user.name, role: 'USER' },
+      ipAddress: ip,
+      userAgent: request.headers.get('user-agent'),
     });
 
     const isProduction = process.env.NODE_ENV === 'production';

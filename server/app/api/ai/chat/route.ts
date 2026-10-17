@@ -5,6 +5,7 @@ import { getGeminiApiKey, generateGeminiContent } from '../../../../lib/gemini';
 import { rateLimit } from '../../../../lib/rate-limit';
 import { ChatRequestSchema } from '../../../../schemas/ai';
 import { calculateTotalBalance } from '../../../../lib/balance';
+import { logAiUsage } from '../../../../lib/ai-logger';
 
 export async function POST(request: Request) {
   try {
@@ -145,7 +146,14 @@ Instructions:
 3. If asking for a BUDGET RECOMMENDATION (e.g. "Recommend a monthly budget for me", "How should I allocate my expenses?"):
    - Recommend a tailored 50/30/20 allocation based on their monthly income of ₹${thisMonthIncome.toLocaleString('en-IN')}: 50% Needs (~₹${Math.round(thisMonthIncome * 0.5).toLocaleString('en-IN')}), 30% Wants (~₹${Math.round(thisMonthIncome * 0.3).toLocaleString('en-IN')}), and 20% Savings (~₹${Math.round(thisMonthIncome * 0.2).toLocaleString('en-IN')}).
    - Provide concrete suggested category targets based on their existing categories (${Object.keys(categoryTotalsMap).join(', ')}).
+
 4. If asking about an affordability purchase (e.g. "Can I afford a ₹20,000 phone?"), compare the price against their total balance, net monthly cash flow, deficit/surplus, and upcoming budgets/goals to give balanced reasoning.
+4b. WHAT-IF FINANCIAL SCENARIO SIMULATION:
+If the user asks a hypothetical 'what if' question (e.g. "What if I cut dining out by 20%?", "What if my salary increases by 15%?", "What if I take a ₹12,000 car EMI?", "What if I save ₹5,000 more each month?"):
+- Isolate the simulated change (income increase, expense cut, or new monthly commitment).
+- Show the exact simulated cash flow: current monthly net savings (₹${netSavings.toLocaleString('en-IN')}) versus simulated new net savings.
+- Calculate concrete timeline impact: how many months faster they will hit their active goals, or how much their annual buffer will grow.
+- Provide clear trade-offs and safety buffer recommendations.
 5. Always format all monetary numbers using the Indian Rupee symbol '₹' and standard comma notation (e.g. ₹20,000, ₹2,34,700). Never use $, USD, or INR.
 6. Do NOT reveal, mention, or invent any personal names, email addresses, specific account titles, or individual transaction details.
 7. End your main answer with:
@@ -159,6 +167,8 @@ RECOMMENDED_FOLLOW_UPS:
 
     let answer = '';
     let followUps: string[] = [];
+    const startTime = Date.now();
+    const promptTokens = Math.round(prompt.length / 4);
 
     try {
       const responseText = await generateGeminiContent(prompt);
@@ -181,6 +191,19 @@ RECOMMENDED_FOLLOW_UPS:
       if (!answer.includes('This is not professional financial advice.')) {
         answer += '\n\nThis is not professional financial advice.';
       }
+
+      // Log AI Usage
+      const completionTokens = Math.round(answer.length / 4);
+      await logAiUsage({
+        userId: user.id,
+        endpoint: '/api/ai/chat',
+        promptTokens,
+        completionTokens,
+        totalTokens: promptTokens + completionTokens,
+        latencyMs: Date.now() - startTime,
+        model: 'gemini-flash-lite',
+        status: 'SUCCESS',
+      });
     } catch (e: any) {
       console.warn('Gemini chat fallback used:', e.message);
 
@@ -255,6 +278,19 @@ RECOMMENDED_FOLLOW_UPS:
 
     // Double check answer is cleaned of asterisks
     answer = answer.replace(/\*\*/g, '').replace(/\*/g, '');
+
+    // Log fallback if main Gemini attempt didn't log
+    const totalDuration = Date.now() - startTime;
+    await logAiUsage({
+      userId: user.id,
+      endpoint: '/api/ai/chat',
+      promptTokens,
+      completionTokens: Math.round(answer.length / 4),
+      totalTokens: promptTokens + Math.round(answer.length / 4),
+      latencyMs: totalDuration,
+      model: answer.includes('smart budget recommendation') ? 'rule-engine-fallback' : 'gemini-fallback',
+      status: 'SUCCESS',
+    }).catch(() => {});
 
     return NextResponse.json({ answer, followUps });
   } catch (error: any) {

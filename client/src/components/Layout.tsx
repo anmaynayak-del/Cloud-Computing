@@ -14,7 +14,10 @@ import {
   CheckCircle, 
   X,
   ChevronsLeft,
-  Wallet
+  Wallet,
+  User,
+  CalendarClock,
+  ShieldAlert
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { fetchApi, getApiUrl } from '../lib/api';
@@ -32,15 +35,40 @@ interface AlertItem {
 }
 
 export const Layout = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, impersonatedUser, setImpersonatedUser } = useAuth();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024;
+    }
+    return false;
+  });
 
   // Alerts State
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [alertsCount, setAlertsCount] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Profile Menu State
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Auto-collapse sidebar on mobile screen resize
+  useEffect(() => {
+    let prevWidth = window.innerWidth;
+    const handleResize = () => {
+      const currentWidth = window.innerWidth;
+      if (prevWidth < 1024 && currentWidth >= 1024) {
+        setSidebarOpen(true);
+      } else if (prevWidth >= 1024 && currentWidth < 1024) {
+        setSidebarOpen(false);
+      }
+      prevWidth = currentWidth;
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const loadAlerts = async () => {
     try {
@@ -60,18 +88,21 @@ export const Layout = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Close dropdown on click outside
+  // Close dropdowns on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
       }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
     };
-    if (dropdownOpen) {
+    if (dropdownOpen || profileDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [dropdownOpen]);
+  }, [dropdownOpen, profileDropdownOpen]);
 
   const handleLogout = async () => {
     await fetch(getApiUrl('/api/auth/logout'), { method: 'POST', credentials: 'include' });
@@ -83,8 +114,11 @@ export const Layout = () => {
     { name: 'Accounts', path: '/accounts', icon: Wallet },
     { name: 'Transactions', path: '/transactions', icon: Receipt },
     { name: 'Budgets', path: '/budgets', icon: PieChart },
+    { name: 'Subscriptions', path: '/subscriptions', icon: CalendarClock },
     { name: 'Goals', path: '/goals', icon: Target },
     { name: 'AI Adviser', path: '/chat', icon: MessageSquare },
+    ...(user?.role === 'ADMIN' ? [{ name: 'Admin Console', path: '/admin', icon: ShieldAlert }] : []),
+    { name: 'Profile', path: '/profile', icon: User },
   ];
 
   // User Initials Badge (like 'PA' in CardioNexus)
@@ -97,20 +131,41 @@ export const Layout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col">
+      {/* Admin Impersonation View-As Top Banner */}
+      {impersonatedUser && (
+        <div className="bg-amber-400 text-amber-950 px-4 py-2 text-xs font-bold flex items-center justify-between sticky top-0 z-30 shadow-md">
+          <div className="flex items-center space-x-2 truncate">
+            <ShieldAlert className="w-4 h-4 text-amber-900 shrink-0" />
+            <span className="truncate">
+              ADMIN VIEW-AS: Viewing records for <strong>{impersonatedUser.name || impersonatedUser.email}</strong> ({impersonatedUser.email})
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              setImpersonatedUser(null);
+              toast.success('Exited View-As mode');
+            }}
+            className="shrink-0 ml-3 px-2.5 py-1 rounded-lg bg-amber-950 text-amber-100 hover:bg-black transition text-xs font-semibold cursor-pointer"
+          >
+            Exit View-As ✕
+          </button>
+        </div>
+      )}
+
       {/* Top Header Bar (spans full width) */}
-      <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-6 sticky top-0 z-30 shadow-xs">
-        <div className="flex items-center space-x-3.5">
-          {/* 3 lines button (visible when sidebar is closed) */}
-          {!sidebarOpen && (
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-1.5 rounded-lg text-emerald-800 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition cursor-pointer"
-              title="Open Dashboard Sidebar"
-              aria-label="Open Dashboard Sidebar"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          )}
+      <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20 shadow-xs">
+        <div className="flex items-center space-x-2 sm:space-x-3.5">
+          {/* Hamburger menu button (always accessible on mobile, visible on desktop when sidebar collapsed) */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className={`p-2 rounded-lg text-emerald-800 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition cursor-pointer ${
+              sidebarOpen ? 'lg:hidden' : 'block'
+            }`}
+            title={sidebarOpen ? "Close navigation" : "Open navigation"}
+            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+          >
+            <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
 
           {/* Brand Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
@@ -124,7 +179,7 @@ export const Layout = () => {
         </div>
 
         {/* Right Header: Alerts Bell & User Avatar Badge */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           {/* Overspending Alerts Bell */}
           <div className="relative" ref={dropdownRef}>
             <button
@@ -141,9 +196,9 @@ export const Layout = () => {
               )}
             </button>
 
-            {/* Alerts Dropdown */}
+            {/* Alerts Dropdown (responsive width on mobile to avoid overflow) */}
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
+              <div className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-96 max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
                 <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-700 flex justify-between items-center">
                   <div className="flex items-center space-x-2">
                     <Bell className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -223,35 +278,124 @@ export const Layout = () => {
             )}
           </div>
 
-          {/* User Initials Avatar Badge (like 'PA' in CardioNexus) */}
-          <div 
-            className="w-8 h-8 rounded-full bg-emerald-800 text-white font-semibold text-xs flex items-center justify-center shadow-xs cursor-pointer select-none"
-            title={`${user?.name || user?.email} (Click to Logout)`}
-            onClick={handleLogout}
-          >
-            {userInitials}
+          {/* User Profile Avatar Button & Dropdown */}
+          <div className="relative" ref={profileDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center shadow-xs cursor-pointer select-none transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              title={`${user?.name || user?.email || 'User'} - Open Profile`}
+              aria-label="Open User Profile"
+              aria-expanded={profileDropdownOpen}
+            >
+              {userInitials}
+            </button>
+
+            {profileDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <Link
+                  to="/profile"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="block p-4 bg-gray-50/80 dark:bg-gray-700/40 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 border-b dark:border-gray-700 transition group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-11 h-11 rounded-full bg-emerald-700 text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-xs">
+                      {userInitials}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                        {user?.name || 'FinSense User'}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+                      <span className="inline-block mt-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                        View Profile & Settings →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+
+                <div className="p-2 space-y-1">
+                  <Link
+                    to="/profile"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition"
+                  >
+                    <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>My Profile</span>
+                  </Link>
+                  <Link
+                    to="/accounts"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition"
+                  >
+                    <Wallet className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span>Manage Accounts</span>
+                  </Link>
+                  <Link
+                    to="/budgets"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition"
+                  >
+                    <PieChart className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                    <span>Monthly Budgets</span>
+                  </Link>
+                  <Link
+                    to="/subscriptions"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition"
+                  >
+                    <CalendarClock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>Subscriptions & Bills</span>
+                  </Link>
+                  {user?.role === 'ADMIN' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition"
+                    >
+                      <ShieldAlert className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                      <span>Admin Console</span>
+                    </Link>
+                  )}
+                </div>
+
+                <div className="p-2 border-t dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       {/* Main Body Container: Sidebar + Content */}
       <div className="flex flex-1 relative min-h-[calc(100vh-4rem)]">
-        {/* Sidebar (when open) */}
+        {/* Sidebar (drawer on mobile, fixed column on desktop) */}
         {sidebarOpen && (
-          <aside className="w-72 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col justify-between p-4 flex-shrink-0 animate-in slide-in-from-left duration-200 z-20">
+          <aside className="fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col justify-between p-4 flex-shrink-0 shadow-2xl lg:shadow-none lg:static lg:z-20 transition-all duration-200">
             <div>
-              {/* Workspace Header Row with << collapse icon */}
+              {/* Workspace Header Row with close icon */}
               <div className="flex items-center justify-between px-3 py-2 mb-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                   FINSENSE WORKSPACE
                 </span>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
-                  title="Collapse sidebar"
-                  aria-label="Collapse sidebar"
+                  className="p-1.5 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+                  title="Close sidebar"
+                  aria-label="Close sidebar"
                 >
-                  <ChevronsLeft className="w-5 h-5" />
+                  <X className="w-5 h-5 lg:hidden" />
+                  <ChevronsLeft className="w-5 h-5 hidden lg:block" />
                 </button>
               </div>
 
@@ -302,13 +446,14 @@ export const Layout = () => {
         {/* Mobile backdrop */}
         {sidebarOpen && (
           <div 
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs z-10 lg:hidden"
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs z-30 lg:hidden transition-opacity"
             onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation overlay"
           />
         )}
 
         {/* Main Content Area */}
-        <main className="flex-1 p-6 lg:p-10 overflow-y-auto">
+        <main className="flex-1 min-w-0 max-w-full p-4 sm:p-6 lg:p-8 overflow-y-auto">
           <Outlet />
         </main>
       </div>
