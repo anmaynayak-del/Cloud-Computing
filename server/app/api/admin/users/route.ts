@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getCurrentUser } from '../../../../lib/auth';
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search')?.trim();
 
-    const whereClause: any = {};
+    const whereClause: Prisma.UserWhereInput = {};
     if (search) {
       whereClause.OR = [
         { name: { contains: search, mode: 'insensitive' } },

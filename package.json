@@ -7,6 +7,8 @@
   },
   "scripts": {
     "build:client": "npm --prefix client run build",
-    "build:server": "npm --prefix server run build"
+    "build:server": "npm --prefix server run build",
+    "build:aws": "node scripts/build-aws.mjs",
+    "start:aws": "node scripts/build-aws.mjs start"
   }
 }

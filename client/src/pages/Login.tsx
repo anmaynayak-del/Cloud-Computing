@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { getApiUrl } from '../lib/api';
+import { fetchApi } from '../lib/api';
 import { 
   Wallet, 
   Lock, 
@@ -36,20 +36,15 @@ export const Login = () => {
     setLoading(true);
     
     try {
-      const res = await fetch(getApiUrl('/api/auth/login'), {
+      const data = await fetchApi('/api/auth/login', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Invalid email or password');
-      
       setUser(data);
       navigate('/');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Sign-in failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -126,7 +121,7 @@ export const Login = () => {
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm animate-in fade-in">
+          <div role="alert" className="mb-6 flex items-start gap-3 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm animate-in fade-in">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -136,7 +131,7 @@ export const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Username or Email Field */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+            <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
               Username or Email
             </label>
             <div className="relative">
@@ -144,7 +139,9 @@ export const Login = () => {
                 <Mail className="w-4 h-4" />
               </div>
               <input
+                id="login-email"
                 type="text"
+                autoComplete="username"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -157,7 +154,7 @@ export const Login = () => {
           {/* Password Field */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
                 Password
               </label>
             </div>
@@ -166,6 +163,8 @@ export const Login = () => {
                 <Lock className="w-4 h-4" />
               </div>
               <input
+                id="login-password"
+                autoComplete="current-password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -175,6 +174,7 @@ export const Login = () => {
               />
               <button
                 type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200 focus:outline-none"
               >
@@ -184,7 +184,7 @@ export const Login = () => {
           </div>
 
           {/* Quick Demo Fill Button */}
-          <div className="flex justify-end">
+        {import.meta.env.MODE !== 'aws' && <div className="flex justify-end">
             <button
               type="button"
               onClick={handleDemoFill}
@@ -193,7 +193,7 @@ export const Login = () => {
               <Sparkles className="w-3.5 h-3.5" />
               Use Demo Credentials (name / demo123)
             </button>
-          </div>
+          </div>}
 
           {/* Submit Button */}
           <button

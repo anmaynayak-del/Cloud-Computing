@@ -11,6 +11,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "tsx test/run-all-tests.ts",
+    "db:setup": "prisma db push --skip-generate && tsx prisma/seed.ts",
+    "user:make-admin": "tsx prisma/ensure-admin.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -20,7 +22,8 @@
     "lru-cache": "^11.5.3",
     "next": "16.3.8",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

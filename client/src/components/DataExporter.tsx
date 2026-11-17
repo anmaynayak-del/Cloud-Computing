@@ -1,13 +1,9 @@
 import { useState } from 'react';
-import { Download, FileText, FileSpreadsheet, Printer, X, Shield, CheckCircle } from 'lucide-react';
+import { Download, FileText, FileSpreadsheet, Printer, X, Shield } from 'lucide-react';
 import { getApiUrl } from '../lib/api';
 import toast from 'react-hot-toast';
 
-interface DataExporterProps {
-  variant?: 'button' | 'dropdown' | 'inline';
-}
-
-export const DataExporter = ({ variant = 'button' }: DataExporterProps) => {
+export const DataExporter = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [downloading, setDownloading] = useState<string | null>(null);
 

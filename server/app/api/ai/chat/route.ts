@@ -243,8 +243,8 @@ RECOMMENDED_FOLLOW_UPS:
         model: 'gemini-flash-lite',
         status: 'SUCCESS',
       });
-    } catch (e: any) {
-      console.warn('Gemini chat fallback used:', e.message);
+    } catch (e) {
+      console.warn('Gemini chat fallback used:', e instanceof Error ? e.message : e);
 
       // Financial guardrail check for fallback
       const isFinanceQuery = /(money|finance|financial|budget|spend|spending|expense|income|saving|savings|afford|salary|rupee|invest|investment|debt|loan|bill|cost|price|balance|account|goal|stock|cash|fund|card|emi|sip|tax|bank|paisa|paise|bachat|kharcha|kharch|kamai|tankha|vetan|kharid|khareed)/i.test(question);
@@ -386,10 +386,10 @@ RECOMMENDED_FOLLOW_UPS:
     }).catch(() => {});
 
     return NextResponse.json({ answer, followUps });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Chat adviser error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process chat adviser request' },
+      { error: 'Failed to process chat adviser request' },
       { status: 500 }
     );
   }

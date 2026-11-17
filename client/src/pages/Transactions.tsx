@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchApi } from '../lib/api';
-import { formatSignedINR, formatINR } from '../lib/currency';
+import { formatSignedINR } from '../lib/currency';
 import { Modal } from '../components/ui/Modal';
 import { TableRowSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';

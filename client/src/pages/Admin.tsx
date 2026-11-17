@@ -5,20 +5,13 @@ import {
   Cpu, 
   History, 
   Search, 
-  ExternalLink, 
   Eye, 
-  CheckCircle, 
-  AlertTriangle, 
   RotateCw,
   Wallet,
   Receipt,
-  Sparkles,
-  TrendingUp,
-  Clock,
   X,
   Shield,
   Layers,
-  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { fetchApi } from '../lib/api';

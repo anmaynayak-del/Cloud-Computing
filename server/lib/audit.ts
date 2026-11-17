@@ -3,7 +3,7 @@ import { prisma } from './prisma';
 export async function logAuditEvent(params: {
   userId?: string | null;
   action: string;
-  details?: string | Record<string, any>;
+  details?: string | Record<string, unknown>;
   targetUserId?: string | null;
   ipAddress?: string | null;
   userAgent?: string | null;

@@ -38,7 +38,7 @@ export async function PUT(req: Request) {
     });
 
     return NextResponse.json(updatedUser);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Failed to update profile' }, { status: 400 });
+  } catch {
+    return NextResponse.json({ error: 'Failed to update profile' }, { status: 400 });
   }
 }

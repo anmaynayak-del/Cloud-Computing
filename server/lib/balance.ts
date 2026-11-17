@@ -1,13 +1,14 @@
+import type { Prisma } from '@prisma/client';
 import { prisma } from './prisma';
 
 export interface AccountWithTransactions {
   id: string;
   name?: string;
   type: string;
-  balance: number | string | any;
+  balance: number | string | Prisma.Decimal;
   transactions?: Array<{
     type: string;
-    amount: number | string | any;
+    amount: number | string | Prisma.Decimal;
   }>;
 }
 

@@ -3,7 +3,6 @@ import { useAuth } from '../hooks/useAuth';
 import { getApiUrl, fetchApi } from '../lib/api';
 import { formatINR } from '../lib/currency';
 import { 
-  User, 
   Mail, 
   Calendar, 
   ShieldCheck, 
@@ -15,7 +14,6 @@ import {
   Edit3, 
   X,
   CreditCard,
-  Shield
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { DataExporter } from '../components/DataExporter';

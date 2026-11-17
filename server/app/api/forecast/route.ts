@@ -134,7 +134,7 @@ export async function GET(request: Request) {
     const last3MonthsAvg = Math.round(last3MonthsTotal / 3);
 
     // 1. Unadjusted Projection ("If spending continues")
-    let projectedRunRateTotal = spentSoFar + dailyRateRunRate * daysRemaining;
+    const projectedRunRateTotal = spentSoFar + dailyRateRunRate * daysRemaining;
 
     // 2. Normalized Projection ("Excluding large one-time expenses")
     // Projects future days using the normalized daily rate, keeping past one-offs already incurred
@@ -244,8 +244,8 @@ export async function GET(request: Request) {
       chartData,
       categoryForecasts,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Forecast error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to generate spending forecast' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to generate spending forecast' }, { status: 500 });
   }
 }

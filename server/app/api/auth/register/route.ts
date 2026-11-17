@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { RegisterSchema } from '../../../../schemas/auth';
-import { signToken } from '../../../../lib/auth';
+import { sessionCookieOptions, signToken } from '../../../../lib/auth';
 import { rateLimit } from '../../../../lib/rate-limit';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
+import { Prisma } from '@prisma/client';
 
 import { logAuditEvent } from '../../../../lib/audit';
 
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Too many registration attempts. Please try again later.' }, { status: 429 });
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsed = RegisterSchema.safeParse(body);
     
     if (!parsed.success) {
@@ -42,20 +43,16 @@ export async function POST(request: Request) {
       userAgent: request.headers.get('user-agent'),
     });
 
-    const isProduction = process.env.NODE_ENV === 'production';
     const token = signToken(user.id);
     const cookieStore = await cookies();
-    cookieStore.set('token', token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
+    cookieStore.set('token', token, sessionCookieOptions());
 
     const { passwordHash: _, ...userWithoutPassword } = user;
     return NextResponse.json(userWithoutPassword, { status: 201 });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ error: 'User already exists' }, { status: 409 });
+    }
     console.error("Register error:", error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }

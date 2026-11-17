@@ -147,8 +147,8 @@ export async function POST(request: Request) {
       skippedDuplicates,
       total: transactions.length,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Import transactions error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to import transactions' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to import transactions' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { getCurrentUser } from '../../../lib/auth';
@@ -37,8 +38,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(category, { status: 201 });
-  } catch (error: any) {
-    if (error.code === 'P2002') return NextResponse.json({ error: 'Category already exists' }, { status: 409 });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') return NextResponse.json({ error: 'Category already exists' }, { status: 409 });
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

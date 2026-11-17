@@ -95,8 +95,8 @@ export async function GET(request: Request) {
       alerts,
       count: alerts.length,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Alerts error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch alerts' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch alerts' }, { status: 500 });
   }
 }

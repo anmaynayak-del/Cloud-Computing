@@ -29,8 +29,8 @@ export function getGeminiApiKey(): { apiKey: string } | { error: string; status:
 
   if (keys.length === 0) {
     return {
-      error: 'Gemini API key is missing or still set to the placeholder. Please configure GEMINI_API_KEY in server/.env',
-      status: 500,
+      error: 'Live AI is unavailable until a Gemini API key is configured.',
+      status: 503,
     };
   }
 
@@ -63,13 +63,10 @@ export async function generateGeminiContent(prompt: string, systemInstruction?: 
     for (const model of FALLBACK_MODELS) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${currentKey}`;
-        const body: any = {
+        const body = {
           contents: [{ parts: [{ text: prompt }] }],
+          ...(systemInstruction && { systemInstruction: { parts: [{ text: systemInstruction }] } }),
         };
-
-        if (systemInstruction) {
-          body.systemInstruction = { parts: [{ text: systemInstruction }] };
-        }
 
         const res = await fetch(url, {
           method: 'POST',
@@ -101,8 +98,8 @@ export async function generateGeminiContent(prompt: string, systemInstruction?: 
         if (text) {
           return text;
         }
-      } catch (err: any) {
-        lastError = err;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
       }
     }
   }

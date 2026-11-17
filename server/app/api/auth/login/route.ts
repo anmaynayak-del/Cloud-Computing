@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { LoginSchema } from '../../../../schemas/auth';
-import { signToken } from '../../../../lib/auth';
+import { sessionCookieOptions, signToken } from '../../../../lib/auth';
 import { rateLimit } from '../../../../lib/rate-limit';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsed = LoginSchema.safeParse(body);
     
     if (!parsed.success) {
@@ -43,16 +43,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const isProduction = process.env.NODE_ENV === 'production';
     const token = signToken(user.id);
     const cookieStore = await cookies();
-    cookieStore.set('token', token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
+    cookieStore.set('token', token, sessionCookieOptions());
 
     if (user.role === 'ADMIN') {
       await logAuditEvent({

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { fetchApi } from '../lib/api';
-import { Send, Bot, User, Sparkles, AlertCircle, RefreshCw, HelpCircle, Mic, MicOff, Languages } from 'lucide-react';
+import { Send, Bot, User, Sparkles, AlertCircle, RefreshCw, HelpCircle, Mic, MicOff } from 'lucide-react';
 
 interface Message {
   id: string;

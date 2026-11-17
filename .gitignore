@@ -6,7 +6,13 @@ build/
 .DS_Store
 *.log
 .next/
+.next-aws/
 *.db
 *.db-journal
 *.tsbuildinfo
+/server/public/assets/
+/server/public/index.html
+/server/public/favicon.svg
+/server/public/icons.svg
+/finsense-aws.zip
 

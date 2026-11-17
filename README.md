@@ -2,6 +2,8 @@
 
 A full-stack, cloud-ready personal finance tracker built with Next.js (App Router API), React + Vite, Tailwind CSS, and PostgreSQL via Prisma.
 
+See [AWS Deployment](AWS_DEPLOYMENT.md) to package and deploy the frontend and API together on Elastic Beanstalk.
+
 ## Features
 - **Authentication:** Secure JWT authentication with `httpOnly` cookies and rate limiting.
 - **Accounts:** Track DEPOSITORY, LOAN, CREDIT, and INVESTMENT accounts.
@@ -12,7 +14,7 @@ A full-stack, cloud-ready personal finance tracker built with Next.js (App Route
 - **Multi-tenant Security:** Complete data isolation by user ID.
 
 ## Prerequisites
-- Node.js (v18+)
+- Node.js 22
 - PostgreSQL (Running locally or via Docker)
 
 ## Setup Instructions
@@ -31,11 +33,8 @@ npm install
 # Copy environment variables
 cp .env.example .env
 
-# Push the Prisma schema to your database
-npx prisma db push
-
-# Seed the database with default transaction categories
-npx tsx prisma/seed.ts
+# Create the tables and seed the default transaction categories
+npm run db:setup
 
 # Start the Next.js API server
 npm run dev

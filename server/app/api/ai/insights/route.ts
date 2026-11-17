@@ -183,8 +183,8 @@ Do not wrap in markdown \`\`\`json blocks.`;
       } else {
         throw new Error('Invalid JSON structure from Gemini response');
       }
-    } catch (e: any) {
-      console.warn('Gemini generation fallback used:', e.message);
+    } catch (e) {
+      console.warn('Gemini generation fallback used:', e instanceof Error ? e.message : e);
 
       // Intelligent rule-based fallback citing exact figures and ₹ symbol
       if (thisMonthIncome === 0 && thisMonthExpenses === 0) {
@@ -252,8 +252,8 @@ Do not wrap in markdown \`\`\`json blocks.`;
     setCachedInsights(user.id, targetYear, targetMonth, result);
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Insights error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch AI insights' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch AI insights' }, { status: 500 });
   }
 }

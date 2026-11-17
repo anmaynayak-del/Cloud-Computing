@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { 
   CalendarClock, 
   RotateCw, 
-  AlertCircle, 
   CheckCircle2, 
   Search, 
   Tv, 
@@ -13,7 +12,6 @@ import {
   TrendingUp,
   CreditCard,
   Calendar,
-  ExternalLink
 } from 'lucide-react';
 import { fetchApi } from '../lib/api';
 import { formatINR } from '../lib/currency';

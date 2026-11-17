@@ -1,17 +1,8 @@
-'use client';
+import { headers } from 'next/headers';
 
-import { useState, useEffect } from 'react';
-
-export default function HomePage() {
-  const [isLocal, setIsLocal] = useState<boolean>(false);
-  const [mounted, setMounted] = useState<boolean>(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const host = window.location.hostname;
-    const local = host === 'localhost' || host === '127.0.0.1';
-    setIsLocal(local);
-  }, []);
+export default async function HomePage() {
+  const host = (await headers()).get('host') ?? '';
+  const isLocal = /^(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(host);
 
   const frontendUrl = isLocal ? 'http://localhost:5173' : 'https://finsense-bw4.pages.dev';
   const displayHost = isLocal ? 'localhost:5173' : 'finsense-bw4.pages.dev';

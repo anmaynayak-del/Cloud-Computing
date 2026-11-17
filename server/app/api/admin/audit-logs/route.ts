@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getCurrentUser } from '../../../../lib/auth';
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
     const action = searchParams.get('action');
     const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
 
-    const where: any = {};
+    const where: Prisma.AuditLogWhereInput = {};
     if (action) {
       where.action = action;
     }

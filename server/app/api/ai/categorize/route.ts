@@ -85,8 +85,8 @@ Do not include any code block formatting like \`\`\`json.`;
         selectedCategoryName = parsed.category.trim();
         if (parsed.reason) reason = parsed.reason;
       }
-    } catch (e: any) {
-      console.warn('Gemini categorize fallback used:', e.message);
+    } catch (e) {
+      console.warn('Gemini categorize fallback used:', e instanceof Error ? e.message : e);
     }
 
     // Match to existing category object in DB
@@ -137,8 +137,8 @@ Do not include any code block formatting like \`\`\`json.`;
     categorizeCache.set(cacheKey, result);
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Categorize error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to categorize transaction' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to categorize transaction' }, { status: 500 });
   }
 }

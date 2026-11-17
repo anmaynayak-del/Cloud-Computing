@@ -22,36 +22,19 @@ const defaultCategories = [
 ];
 
 async function main() {
-  console.log(`Start seeding default categories...`);
-  for (const c of defaultCategories) {
-    const category = await prisma.category.upsert({
-      where: {
-        userId_name_type: {
-          userId: 'default', // Since userId is nullable and unique constraint includes it, but Prisma unique needs concrete values if we use it, wait: prisma unique constraint on optional fields can be tricky. Actually, Prisma allows upsert by unique if all are provided. But wait, `userId: null` is not supported in `where` for upsert easily.
-          name: c.name,
-          type: c.type
-        }
-      },
-      update: {},
-      create: {
-        name: c.name,
-        type: c.type,
-      },
-    }).catch(async (e) => {
-      // Fallback if upsert fails due to null handling in unique constraints
-      const existing = await prisma.category.findFirst({
-        where: { name: c.name, type: c.type, userId: null }
-      });
-      if (!existing) {
-        return prisma.category.create({
-          data: { name: c.name, type: c.type }
-        });
-      }
-      return existing;
+  await prisma.$transaction(async tx => {
+    // Serialize seeds, since PostgreSQL allows duplicate nulls in the category unique key.
+    await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(630917)`;
+    const existing = await tx.category.findMany({
+      where: { userId: null },
+      select: { name: true, type: true },
     });
-    console.log(`Created category: ${category.name}`);
-  }
-  console.log(`Seeding finished.`);
+    const missing = defaultCategories.filter(category =>
+      !existing.some(row => row.name === category.name && row.type === category.type)
+    );
+    if (missing.length > 0) await tx.category.createMany({ data: missing });
+  });
+  console.log('Default categories are ready.');
 }
 
 main()

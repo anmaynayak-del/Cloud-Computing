@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { getApiUrl } from '../lib/api';
+import { fetchApi } from '../lib/api';
 import { 
   Wallet, 
   Lock, 
@@ -32,20 +32,15 @@ export const Register = () => {
     setLoading(true);
     
     try {
-      const res = await fetch(getApiUrl('/api/auth/register'), {
+      const data = await fetchApi('/api/auth/register', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
       
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || data.error || 'Registration failed');
-      
       setUser(data);
       navigate('/');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -122,7 +117,7 @@ export const Register = () => {
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm animate-in fade-in">
+          <div role="alert" className="mb-6 flex items-start gap-3 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm animate-in fade-in">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -132,7 +127,7 @@ export const Register = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name Field */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+            <label htmlFor="register-name" className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
               Full Name
             </label>
             <div className="relative">
@@ -140,12 +135,14 @@ export const Register = () => {
                 <User className="w-4 h-4" />
               </div>
               <input
+                id="register-name"
+                autoComplete="name"
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 required
                 minLength={2}
-                placeholder="Anush Mestha"
+                placeholder="Your name"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700/80 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-150"
               />
             </div>
@@ -153,7 +150,7 @@ export const Register = () => {
 
           {/* Email Field */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+            <label htmlFor="register-email" className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
               Email Address
             </label>
             <div className="relative">
@@ -161,6 +158,8 @@ export const Register = () => {
                 <Mail className="w-4 h-4" />
               </div>
               <input
+                id="register-email"
+                autoComplete="email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -173,7 +172,7 @@ export const Register = () => {
 
           {/* Password Field */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+            <label htmlFor="register-password" className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
               Password
             </label>
             <div className="relative">
@@ -181,6 +180,8 @@ export const Register = () => {
                 <Lock className="w-4 h-4" />
               </div>
               <input
+                id="register-password"
+                autoComplete="new-password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -191,6 +192,7 @@ export const Register = () => {
               />
               <button
                 type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200 focus:outline-none"
               >

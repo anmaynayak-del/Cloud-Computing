@@ -1,6 +1,21 @@
 import type { NextConfig } from "next";
 
+const sameOrigin = process.env.FINSENSE_SAME_ORIGIN === 'true';
+
 const nextConfig: NextConfig = {
+  distDir: sameOrigin ? '.next-aws' : '.next',
+  async rewrites() {
+    if (!sameOrigin) return [];
+
+    return {
+      beforeFiles: [{ source: '/', destination: '/index.html' }],
+      afterFiles: [],
+      fallback: [{
+        source: '/:path((?!api(?:/|$)|assets(?:/|$)|_next(?:/|$))[^.]+)',
+        destination: '/index.html',
+      }],
+    };
+  },
   async headers() {
     return [
       {

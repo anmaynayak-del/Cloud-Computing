@@ -92,7 +92,7 @@ export async function runApiIsolationTests(baseUrl: string = 'http://localhost:3
     // Fetch existing categories for User A
     const catsRes = await fetch(`${baseUrl}/categories`, { headers: headersA });
     const categories = await catsRes.json();
-    const expenseCat = categories.find((c: any) => c.type === 'EXPENSE') || categories[0];
+    const expenseCat = categories.find((c: { type: string }) => c.type === 'EXPENSE') || categories[0];
 
     // 4. User A creates a Transaction
     const txnRes = await fetch(`${baseUrl}/transactions`, {
@@ -226,25 +226,25 @@ export async function runApiIsolationTests(baseUrl: string = 'http://localhost:3
 
     const bAccountsList = await fetch(`${baseUrl}/accounts`, { headers: headersB }).then(r => r.json());
     assert(
-      !bAccountsList.some((a: any) => a.id === accountA.id),
+      !bAccountsList.some((a: { id: string }) => a.id === accountA.id),
       'User B accounts list does not include User A account'
     );
 
     const bTxnList = await fetch(`${baseUrl}/transactions`, { headers: headersB }).then(r => r.json());
     assert(
-      !bTxnList.data?.some((t: any) => t.id === transactionA.id),
+      !bTxnList.data?.some((t: { id: string }) => t.id === transactionA.id),
       'User B transactions list does not include User A transaction'
     );
 
     const bBudgetSummary = await fetch(`${baseUrl}/budgets/summary`, { headers: headersB }).then(r => r.json());
     assert(
-      !bBudgetSummary.summary?.some((b: any) => b.id === budgetA.id),
+      !bBudgetSummary.summary?.some((b: { id: string }) => b.id === budgetA.id),
       'User B budget summary does not include User A budget'
     );
 
     const bGoalsList = await fetch(`${baseUrl}/goals`, { headers: headersB }).then(r => r.json());
     assert(
-      !bGoalsList.some((g: any) => g.id === goalA.id),
+      !bGoalsList.some((g: { id: string }) => g.id === goalA.id),
       'User B goals list does not include User A goal'
     );
 
@@ -254,7 +254,7 @@ export async function runApiIsolationTests(baseUrl: string = 'http://localhost:3
       'User B dashboard reflects zero activity (balance=0, income=0, expense=0), fully isolated from User A'
     );
 
-  } catch (err: any) {
+  } catch (err) {
     console.error('Test runner encountered an error:', err);
     failed++;
   }

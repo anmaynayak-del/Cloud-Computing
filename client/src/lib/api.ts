@@ -20,7 +20,19 @@ export const fetchApi = async (url: string, options: RequestInit = {}) => {
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) {
-    throw new Error(data?.error?.message || data?.error || 'An error occurred');
+    const error = data?.error;
+    const fieldErrors = error && typeof error === 'object'
+      ? Object.values(error).flatMap(field => {
+          if (!field || typeof field !== 'object' || !('_errors' in field)) return [];
+          return Array.isArray(field._errors) ? field._errors.filter(message => typeof message === 'string') : [];
+        })
+      : [];
+    throw new Error(
+      (typeof error === 'string' && error)
+      || (typeof error?.message === 'string' && error.message)
+      || fieldErrors[0]
+      || 'The request could not be completed.'
+    );
   }
   return data;
 };

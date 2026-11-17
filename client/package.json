@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
+    "build:aws": "npm run build -- --mode aws",
     "lint": "oxlint",
     "preview": "vite preview"
   },
